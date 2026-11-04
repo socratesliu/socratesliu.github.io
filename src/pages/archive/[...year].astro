@@ -1,0 +1,135 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface MonthGroup {
+  year: number;
+  month: number;
+  count: number;
+  path: string;
+}
+
+interface Props {
+  isIndex: boolean;
+  months?: MonthGroup[];
+  total?: number;
+  year?: number;
+  month?: number;
+  posts?: CollectionEntry<'blog'>[];
+}
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => import.meta.env.PROD ? !data.draft : true);
+
+  // 按「年-月」分组
+  const groups = new Map<string, { year: number; month: number; posts: typeof posts }>();
+
+  for (const post of posts) {
+    const d = post.data.pubDate;
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const key = `${year}-${String(month).padStart(2, '0')}`;
+
+    const group = groups.get(key) ?? { year, month, posts: [] };
+    group.posts.push(post);
+    groups.set(key, group);
+  }
+
+  const sorted = Array.from(groups.values()).sort(
+    (a, b) => b.year - a.year || b.month - a.month
+  );
+
+  // 归档首页:/archive/  —— 列出所有月份
+  const indexPath = {
+    params: { year: undefined },
+    props: {
+      isIndex: true,
+      months: sorted.map((g) => ({
+        year: g.year,
+        month: g.month,
+        count: g.posts.length,
+        path: `/archive/${g.year}-${String(g.month).padStart(2, '0')}/`,
+      })),
+      total: posts.length,
+    },
+  };
+
+  // 月份页:/archive/2026-11/ —— 列出该月文章
+  const monthPaths = sorted.map((group) => ({
+    params: { year: `${group.year}-${String(group.month).padStart(2, '0')}` },
+    props: {
+      isIndex: false,
+      year: group.year,
+      month: group.month,
+      posts: group.posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+    },
+  }));
+
+  return [indexPath, ...monthPaths];
+}
+
+const { isIndex, months = [], total = 0, year, month, posts = [] } = Astro.props as Props;
+const monthLabel =
+  year && month
+    ? new Date(year, month - 1, 1).toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+      })
+    : '';
+---
+
+<BaseLayout
+  title={isIndex ? '归档' : `归档: ${monthLabel}`}
+  description={isIndex ? `全部 ${total} 篇文章的归档索引` : `${monthLabel}发布的全部文章`}
+>
+  <h1>归档</h1>
+
+  {
+    isIndex ? (
+      <>
+        <p class="post-meta">共 {total} 篇文章</p>
+        {months.length === 0 ? (
+          <p class="empty-state">还没有发布任何文章。</p>
+        ) : (
+          <ul class="tag-list">
+            {months.map(({ year: y, month: m, count, path }) => (
+              <li>
+                <a class="tag" href={path}>
+                  {y} 年 {m} 月
+                  <span class="tag-count">{count}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
+    ) : (
+      <>
+        <p class="post-meta">
+          <a href="/archive/">全部归档</a> · 共 {posts.length} 篇文章
+        </p>
+
+        <h2>{monthLabel}</h2>
+
+        <ul class="post-list">
+          {posts.map((post) => (
+            <li>
+              <h3 class="post-title">
+                <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+              </h3>
+              <div class="post-meta">
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {post.data.pubDate.toLocaleDateString('zh-CN', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </time>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+</BaseLayout>

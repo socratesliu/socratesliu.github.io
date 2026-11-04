@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://socratesliu.github.io/sitemap-index.xml

@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config';
+---
+
+<BaseLayout title="关于" description="关于本站与作者">
+  <h1>关于</h1>
+
+  <p>
+    这里是 <strong>{SITE.author}</strong> 的个人博客,用来记录技术实践、阅读笔记与日常思考。
+  </p>
+
+  <p>
+    站点基于 <a href="https://astro.build" rel="noopener noreferrer" target="_blank">Astro</a>
+    构建,通过 GitHub Pages 发布,内容以 Markdown 编写并托管在 GitHub 仓库中。
+  </p>
+
+  <h2>本站包含什么</h2>
+  <ul>
+    <li><strong>文章</strong> —— 长期性的技术笔记与实践总结</li>
+    <li><strong>标签</strong> —— 按主题归类,便于横向浏览</li>
+    <li><strong>归档</strong> —— 按发布时间倒序排列的全部文章</li>
+    <li><strong>订阅</strong> —— 通过 <a href="/rss.xml">RSS</a> 订阅更新</li>
+  </ul>
+
+  <h2>联系方式</h2>
+  <p>
+    欢迎交流讨论,可以通过
+    <a href="https://github.com/socratesliu" rel="noopener noreferrer" target="_blank">GitHub</a>
+    找到我。
+  </p>
+</BaseLayout>

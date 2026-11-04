@@ -1,0 +1,63 @@
+---
+import { GISCUS, SITE } from '../config';
+
+/**
+ * Giscus 评论组件。
+ *
+ * 依赖:仓库已开启 Discussions 功能,且已安装 giscus App。
+ * 若未配置,giscus 脚本加载失败时不会影响页面其余内容。
+ */
+---
+
+<section class="comments" aria-label="评论">
+  <h2>评论</h2>
+  <script
+    src="https://giscus.app/client.js"
+    data-repo={SITE.repo}
+    data-repo-id={GISCUS.repoId}
+    data-category={GISCUS.category}
+    data-category-id={GISCUS.categoryId}
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="bottom"
+    data-theme="preferred_color_scheme"
+    data-lang="zh-CN"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async
+  ></script>
+  <noscript>
+    <p class="empty-state">请启用 JavaScript 以查看评论。</p>
+  </noscript>
+</section>
+
+<script>
+  /**
+   * 让评论框跟随站点主题。
+   *
+   * Giscus 的 iframe 初始主题由 data-theme="preferred_color_scheme" 决定,
+   * 但用户手动切换站点主题时需要通过 postMessage 通知它重新着色。
+   * Giscus 初始化完成后会向父窗口发一条 { giscus: { iframe: { ready: true } } } 消息。
+   */
+  function currentTheme() {
+    return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+  }
+
+  function syncGiscusTheme() {
+    const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+    if (!iframe?.contentWindow) return;
+    iframe.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: currentTheme() } } },
+      'https://giscus.app',
+    );
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.origin !== 'https://giscus.app') return;
+    if (event.data?.giscus?.iframe?.ready) syncGiscusTheme();
+  });
+
+  document.addEventListener('theme-change', syncGiscusTheme);
+</script>
