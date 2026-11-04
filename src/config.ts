@@ -2,9 +2,9 @@
  * 站点全局信息集中管理。修改站点标题、描述、作者等信息只需改这一个文件。
  */
 export const SITE = {
-  title: '刘晓龙的技术博客',
+  title: '苏格拉底刘的技术博客',
   description: '记录技术实践、阅读笔记与日常思考。',
-  author: '刘晓龙',
+  author: '苏格拉底刘',
   /** 语言标记,影响 <html lang> 与 RSS 的 language 字段 */
   lang: 'zh-CN',
   /** 仓库地址,Giscus 评论组件需要 */

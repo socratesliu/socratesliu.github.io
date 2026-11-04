@@ -1,4 +1,4 @@
-# 刘晓龙的技术博客
+# 苏格拉底刘的技术博客
 
 基于 [Astro](https://astro.build) 7.3.8 构建的中文个人博客,通过 GitHub Actions 自动部署到 GitHub Pages。
 
@@ -114,9 +114,9 @@ Frontmatter 字段由 `src/content.config.ts` 中的 Zod schema 校验,字段缺
 
 ```ts
 export const SITE = {
-  title: '刘晓龙的技术博客',
+  title: '苏格拉底刘的技术博客',
   description: '记录技术实践、阅读笔记与日常思考。',
-  author: '刘晓龙',
+  author: '苏格拉底刘',
   lang: 'zh-CN',
   repo: 'socratesliu/socratesliu.github.io',
 } as const;
